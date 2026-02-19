@@ -1,67 +1,56 @@
 import os
-import urllib.parse
-import pyodbc
 from flask import Flask, render_template, request, redirect, url_for
-from models import db, Post
+from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
 
-# Veritabanı Değişkenleri
+# Veritabanı Bağlantı Bilgileri
 DB_USER = os.getenv('DB_USER')
-DB_PASS = os.getenv('DB_PASSWORD')
-DB_HOST = os.getenv('DB_HOST')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_NAME = os.getenv('DB_NAME')
+DB_HOST = os.getenv('DB_HOST')
 
-# Sistemdeki sürücüyü bul (18, 17 veya default)
-try:
-    drivers = [d for d in pyodbc.drivers() if 'SQL Server' in d]
-    current_driver = drivers[0] if drivers else '{ODBC Driver 18 for SQL Server}'
-except:
-    current_driver = '{ODBC Driver 18 for SQL Server}'
-
-# MSSQL Bağlantı Cümlesi
-params = urllib.parse.quote_plus(
-    f"DRIVER={current_driver};"
-    f"SERVER={DB_HOST};"
-    f"DATABASE={DB_NAME};"
-    f"UID={DB_USER};"
-    f"PWD={DB_PASS};"
-    "Encrypt=yes;"
-    "TrustServerCertificate=no;"
-    "Connection Timeout=30;"
+# SQL Server Bağlantı Dizgisi
+connection_string = (
+    f"Driver={{ODBC Driver 18 for SQL Server}};"
+    f"Server={DB_HOST};"
+    f"Database={DB_NAME};"
+    f"Uid={DB_USER};"
+    f"Pwd={DB_PASSWORD};"
+    f"Encrypt=yes;"
+    f"TrustServerCertificate=no;"
+    f"Connection Timeout=30;"
 )
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mssql+pyodbc:///?odbc_connect={params}"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mssql+pyodbc:///?odbc_connect={connection_string}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.init_app(app)
+db = SQLAlchemy(app)
 
+# Basit Veritabanı Modeli
+class Post(db.Model):
+    __tablename__ = 'Post'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+
+# Tabloları Uygulama Başlarken Oluştur
 with app.app_context():
-    try:
-        db.create_all()
-    except Exception as e:
-        print(f"Tablo oluşturma hatası (Yerelde sürücü yoksa normaldir): {e}")
+    db.create_all()
 
 @app.route('/')
 def index():
-    posts = Post.query.order_by(Post.id.desc()).all()
-    # Azure Storage için sadece ana URL (Örn: https://hesap.blob.core.windows.net/konteynir)
-    storage_url = os.getenv('AZURE_STORAGE_CONNECTION_STRING', '').split(';')[0].replace('DefaultEndpointsProtocol=https;AccountName=', 'https://').split(';')[0]
-    # Eğer yukarıdaki karmaşık gelirse direkt tırnak içine URL'ni de yazabilirsin:
-    # storage_url = "https://berkaystorage.blob.core.windows.net/resimler"
-    return render_template('index.html', posts=posts, storage_url=storage_url)
+    posts = Post.query.all()
+    return render_template('index.html', posts=posts)
 
 @app.route('/add', methods=['POST'])
-def add():
+def add_post():
     title = request.form.get('title')
     content = request.form.get('content')
-    image_name = request.form.get('image_name')
-    
     if title and content:
-        new_post = Post(title=title, content=content, image_url=image_name)
+        new_post = Post(title=title, content=content)
         db.session.add(new_post)
         db.session.commit()
     return redirect(url_for('index'))

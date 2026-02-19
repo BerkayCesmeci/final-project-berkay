@@ -3,64 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gezgin Blog | Azure</title>
+    <title>Berkay | Gezi Günlüğü</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        .hero { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1503220317375-aaad61436b1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; color: white; padding: 80px 0; text-align: center; margin-bottom: 30px; }
-        .card { border: none; border-radius: 12px; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .card:hover { transform: translateY(-5px); }
-        .card-img-top { height: 220px; object-fit: cover; border-top-left-radius: 12px; border-top-right-radius: 12px; }
-        .btn-add { background-color: #ff4b2b; border: none; color: white; }
-        .btn-add:hover { background-color: #ff416c; }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar { background-color: #2c3e50; shadow: 0 2px 4px rgba(0,0,0,.1); }
+        .blog-card { border: none; border-radius: 15px; transition: transform 0.3s; }
+        .blog-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,.1); }
+        .btn-primary { background-color: #3498db; border: none; }
+        .header-section { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80'); 
+                          background-size: cover; color: white; padding: 100px 0; text-align: center; margin-bottom: 50px; }
     </style>
 </head>
 <body>
 
-<div class="hero">
-    <h1 class="display-3">Yolculuk Günlüğüm</h1>
-    <p>Azure Üzerinde Yayınlanan Tek Sayfa Gezi Bloğum</p>
-</div>
-
-<div class="container">
-    <div class="row justify-content-center mb-5">
-        <div class="col-md-7">
-            <div class="card p-4">
-                <h4 class="mb-4">Yeni Bir Yer Keşfet</h4>
-                <form action="/add" method="POST">
-                    <div class="mb-3">
-                        <input type="text" name="title" class="form-control" placeholder="Gidilen Yer (Örn: Kapadokya)" required>
-                    </div>
-                    <div class="mb-3">
-                        <input type="text" name="image_name" class="form-control" placeholder="Resim Adı (Örn: kapadokya.jpg)">
-                    </div>
-                    <div class="mb-3">
-                        <textarea name="content" class="form-control" rows="3" placeholder="Neler gördün, neler yedin?" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-add w-100 fw-bold">YAYINLA</button>
-                </form>
-            </div>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-0">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">🌍 GEZİ GÜNLÜĞÜ</a>
         </div>
-    </div>
+    </nav>
 
-    <div class="row g-4">
-        {% for post in posts %}
-        <div class="col-md-4">
-            <div class="card h-100">
-                <img src="{{ storage_url }}/{{ post.image_url if post.image_url else 'default.jpg' }}" class="card-img-top" alt="{{ post.title }}">
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">{{ post.title }}</h5>
-                    <p class="card-text text-muted">{{ post.content }}</p>
+    <header class="header-section">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Dünyayı Keşfet</h1>
+            <p class="lead">Anılarını biriktir, hikayeni paylaş.</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card p-4 shadow-sm border-0" style="border-radius: 15px;">
+                    <h4 class="mb-3 text-secondary">Yeni Yazı Paylaş</h4>
+                    <form action="/add" method="POST">
+                        <div class="mb-3">
+                            <input type="text" name="title" class="form-control" placeholder="Yazı Başlığı" required>
+                        </div>
+                        <div class="mb-3">
+                            <textarea name="content" class="form-control" rows="5" placeholder="Neler Gördün?" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Yayınla</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <h3 class="mb-4 text-dark border-bottom pb-2">Son Hikayeler</h3>
+                <div class="row">
+                    {% for post in posts %}
+                    <div class="col-md-12 mb-4">
+                        <div class="card blog-card shadow-sm">
+                            <div class="card-body p-4">
+                                <h2 class="card-title h4 fw-bold text-primary">{{ post.title }}</h2>
+                                <p class="card-text text-muted">{{ post.content }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <small class="text-secondary">📅 Bugün paylaşıldı</small>
+                                    <a href="#" class="text-decoration-none fw-bold">Devamını Oku →</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-        {% endfor %}
     </div>
-</div>
 
-<footer class="text-center py-5 mt-5 bg-white">
-    <p class="text-muted small">© 2026 Azure Travel Project | GitHub CI/CD</p>
-</footer>
+    <footer class="text-center py-4 text-muted mt-5">
+        &copy; 2026 Berkay Gezi Blogu | Tüm Hakları Saklıdır.
+    </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
