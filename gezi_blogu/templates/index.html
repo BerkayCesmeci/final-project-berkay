@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gezgin Blog | Azure</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .hero { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1503220317375-aaad61436b1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; color: white; padding: 80px 0; text-align: center; margin-bottom: 30px; }
+        .card { border: none; border-radius: 12px; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .card:hover { transform: translateY(-5px); }
+        .card-img-top { height: 220px; object-fit: cover; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+        .btn-add { background-color: #ff4b2b; border: none; color: white; }
+        .btn-add:hover { background-color: #ff416c; }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1 class="display-3">Yolculuk Günlüğüm</h1>
+    <p>Azure Üzerinde Yayınlanan Tek Sayfa Gezi Bloğum</p>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-7">
+            <div class="card p-4">
+                <h4 class="mb-4">Yeni Bir Yer Keşfet</h4>
+                <form action="/add" method="POST">
+                    <div class="mb-3">
+                        <input type="text" name="title" class="form-control" placeholder="Gidilen Yer (Örn: Kapadokya)" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" name="image_name" class="form-control" placeholder="Resim Adı (Örn: kapadokya.jpg)">
+                    </div>
+                    <div class="mb-3">
+                        <textarea name="content" class="form-control" rows="3" placeholder="Neler gördün, neler yedin?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-add w-100 fw-bold">YAYINLA</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for post in posts %}
+        <div class="col-md-4">
+            <div class="card h-100">
+                <img src="{{ storage_url }}/{{ post.image_url if post.image_url else 'default.jpg' }}" class="card-img-top" alt="{{ post.title }}">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ post.title }}</h5>
+                    <p class="card-text text-muted">{{ post.content }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<footer class="text-center py-5 mt-5 bg-white">
+    <p class="text-muted small">© 2026 Azure Travel Project | GitHub CI/CD</p>
+</footer>
+
+</body>
+</html>
